@@ -293,17 +293,6 @@
       <artifactId>protobuf-java</artifactId>
       <version>${protobuf-java.version}</version>
     </dependency>
-    <!-- Intentionally avoid an dependencyManagement entry because of conflict with thin-client -->
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>${cdh.httpcomponents.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-      <version>4.4.4</version>
-    </dependency>
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>

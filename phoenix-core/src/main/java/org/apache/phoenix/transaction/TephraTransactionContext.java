@@ -452,7 +452,46 @@ public class TephraTransactionContext implements PhoenixTransactionContext {
         public Result getRowOrBefore(byte[] row, byte[] family) throws IOException {
             return delegate.getRowOrBefore(row, family);
         }
-        
+
+        @Override
+        public void setOperationTimeout(int operationTimeout) {
+            delegate.setOperationTimeout(operationTimeout);
+        }
+
+        @Override
+        public int getOperationTimeout() {
+            return delegate.getOperationTimeout();
+        }
+
+        @Override
+        public int getRpcTimeout() {
+            return delegate.getRpcTimeout();
+        }
+
+        @Override
+        public void setRpcTimeout(int rpcTimeout) {
+            delegate.setRpcTimeout(rpcTimeout);
+        }
+
+        @Override
+        public int getReadRpcTimeout() {
+            return delegate.getReadRpcTimeout();
+        }
+
+        @Override
+        public void setReadRpcTimeout(int readRpcTimeout) {
+            delegate.setReadRpcTimeout(readRpcTimeout);
+        }
+
+        @Override
+        public int getWriteRpcTimeout() {
+            return delegate.getWriteRpcTimeout();
+        }
+
+        @Override
+        public void setWriteRpcTimeout(int writeRpcTimeout) {
+            delegate.setWriteRpcTimeout(writeRpcTimeout);
+        }
     }
     
     @Override

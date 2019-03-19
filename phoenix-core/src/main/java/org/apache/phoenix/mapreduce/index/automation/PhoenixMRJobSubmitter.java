@@ -83,6 +83,7 @@ public class PhoenixMRJobSubmitter {
             "phoenix.mr.client.retries.number";
     public static final String PHOENIX_MR_ZK_RECOVERY_RETRY =
             "phoenix.mr.zk.recovery.retry";
+    public static final String TASK_TIMEOUT = "mapreduce.task.timeout";
     private static final String AUTO_INDEX_BUILD_LOCK_NAME = "ActiveStandbyElectorLock";
     private static final int DEFAULT_TIMEOUT_IN_MILLIS = 600000;
     public static final int DEFAULT_MR_CLIENT_SCANNER_TIMEOUT_PERIOD = DEFAULT_TIMEOUT_IN_MILLIS;
@@ -135,7 +136,7 @@ public class PhoenixMRJobSubmitter {
         conf.setLong(HConstants.HBASE_RPC_TIMEOUT_KEY, 
                 conf.getLong(PHOENIX_MR_RPC_TIMEOUT,
                         DEFAULT_MR_RPC_TIMEOUT));
-        conf.setLong(MRJobConfig.TASK_TIMEOUT, 
+        conf.setLong(TASK_TIMEOUT,
                 conf.getLong(PHOENIX_MR_TASK_TIMEOUT,
                         DEFAULT_MR_TASK_TIMEOUT));
 

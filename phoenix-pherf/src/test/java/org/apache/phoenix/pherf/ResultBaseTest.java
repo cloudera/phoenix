@@ -22,6 +22,7 @@ import org.apache.phoenix.pherf.result.ResultUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import java.io.File;
 import java.util.Properties;
 
 public class ResultBaseTest {
@@ -41,7 +42,10 @@ public class ResultBaseTest {
         isSetUpDone = true;
     }
     
-    @AfterClass public static void tearDown() throws Exception {
-    	new ResultUtil().deleteDir(properties.getProperty("pherf.default.results.dir"));
+    @AfterClass
+    public static void tearDown() throws Exception {
+        String dirAbsolute =
+            new File(properties.getProperty("pherf.default.results.dir")).getAbsolutePath();
+        new ResultUtil().deleteDir(dirAbsolute);
     }
 }

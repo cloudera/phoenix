@@ -487,6 +487,8 @@
             <exclude>CHANGES</exclude>
             <!-- IDE configuration -->
             <exclude>dev/phoenix.importorder</exclude>
+            <exclude>**/.idea/**</exclude>
+            <exclude>**/*.iml</exclude>
             <!-- Release L&N -->
             <exclude>dev/release_files/LICENSE</exclude>
             <exclude>dev/release_files/NOTICE</exclude>
@@ -508,6 +510,9 @@
             <exclude>python/doc/*.rst</exclude>
             <exclude>python/doc/conf.py</exclude>
             <exclude>python/doc/Makefile</exclude>
+            <!-- Exclude source control files --> -->
+            <exclude>.git/**</exclude>
+            <exclude>**/.gitignore</exclude>
           </excludes>
         </configuration>
       </plugin>

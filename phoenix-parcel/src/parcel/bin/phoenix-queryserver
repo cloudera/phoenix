@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ############################################################################
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -36,4 +36,4 @@
 . $LIB_DIR/../../CDH/lib/bigtop-utils/bigtop-detect-javahome
 
 export PATH=$JAVA_HOME/jre/bin:$PATH
-exec $LIB_DIR/phoenix/bin/phoenix_utils.py "$@"
+exec $LIB_DIR/phoenix/bin/queryserver.py "$@"

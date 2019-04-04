@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ############################################################################
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -35,5 +35,6 @@
 # Autodetect JAVA_HOME if not defined
 . $LIB_DIR/../../CDH/lib/bigtop-utils/bigtop-detect-javahome
 
+export HBASE_CONF_PATH=${HBASE_CONF_PATH:-/etc/hbase/conf}
 export PATH=$JAVA_HOME/jre/bin:$PATH
-exec $LIB_DIR/phoenix/bin/psql.py "$@"
+exec $LIB_DIR/phoenix/bin/sqlline.py "$@"

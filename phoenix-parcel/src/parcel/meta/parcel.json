@@ -1,6 +1,6 @@
 {
     "schema_version": 1,
-    "name": "APACHE_PHOENIX",
+    "name": "PHOENIX",
     "version": "${parcel.version}",
     "groups": [],
     "extraVersionInfo": {

@@ -27,3 +27,5 @@ release/
 RESULTS/
 CSV_EXPORT/
 
+gbn_build_*.html
+cloudera/cdh_version.properties

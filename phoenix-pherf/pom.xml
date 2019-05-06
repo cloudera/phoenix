@@ -15,7 +15,7 @@
 	<parent>
 		<groupId>org.apache.phoenix</groupId>
 		<artifactId>phoenix</artifactId>
-		<version>4.14.1-cdh5.16.2-SNAPSHOT</version>
+		<version>4.14.1-cdh5.16.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>phoenix-pherf</artifactId>

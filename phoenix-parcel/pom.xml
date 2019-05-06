@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.apache.phoenix</groupId>
     <artifactId>phoenix</artifactId>
-    <version>4.14.1-cdh5.16.2-SNAPSHOT</version>
+    <version>4.14.1-cdh5.16.3-SNAPSHOT</version>
   </parent>
   <artifactId>phoenix-parcel</artifactId>
   <name>Phoenix Parcels for CDH</name>
@@ -48,7 +48,7 @@
     <parcel.package.version>${phoenix.version}+${cdh.version}+${parcel.patch.count}</parcel.package.version>
     <parcel.component.version>${phoenix.version}-${cdh.version}</parcel.component.version>
     <parcel.component.release>${cdh.version}.p${parcel.release}</parcel.component.release>
-    <parcel.depends>CDH (&gt;= ${cdh.minor.version}.0), CDH (&lt;= ${cdh.minor.version}.999)</parcel.depends>
+    <parcel.depends>CDH (&gt;= 5.16.3), CDH (&lt;&lt; 6.0)</parcel.depends>
   </properties>
 
   <build>

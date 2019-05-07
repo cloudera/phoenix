@@ -190,7 +190,7 @@ done
 ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa_systest s3@cloudcat-s3.infra.cloudera.com build  > ~/.s3-auth-file
 
 # create repos and upload artifacts to s3
-DOCKER_IMG="docker-registry.infra.cloudera.com/cauldron/ubuntu1604:latest"
+DOCKER_IMG="docker-registry.infra.cloudera.com/cauldron/ubuntu1604:1023055"
 docker pull $DOCKER_IMG
 if ! docker inspect $DOCKER_IMG;then
 	echo "Docker image not downloaded correctly please check docker image : $DOCKER_IMG"

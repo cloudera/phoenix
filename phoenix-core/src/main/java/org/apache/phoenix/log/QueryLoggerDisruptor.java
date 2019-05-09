@@ -20,6 +20,7 @@ package org.apache.phoenix.log;
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -69,10 +70,11 @@ public class QueryLoggerDisruptor implements Closeable{
                 })
                 .build();
         disruptor = new Disruptor<RingBufferEvent>(RingBufferEvent.FACTORY,
-                configuration.getInt(QueryServices.LOG_BUFFER_SIZE, RING_BUFFER_SIZE), threadFactory, ProducerType.MULTI,
+                configuration.getInt(QueryServices.LOG_BUFFER_SIZE, RING_BUFFER_SIZE),
+                Executors.newCachedThreadPool(threadFactory), ProducerType.MULTI,
                 waitStrategy);
-        final ExceptionHandler<RingBufferEvent> errorHandler = new QueryLoggerDefaultExceptionHandler();
-        disruptor.setDefaultExceptionHandler(errorHandler);
+        final ExceptionHandler errorHandler = new QueryLoggerDefaultExceptionHandler();
+        disruptor.handleExceptionsWith(errorHandler);
 
         final QueryLogDetailsEventHandler[] handlers = { new QueryLogDetailsEventHandler(configuration) };
         disruptor.handleEventsWith(handlers);

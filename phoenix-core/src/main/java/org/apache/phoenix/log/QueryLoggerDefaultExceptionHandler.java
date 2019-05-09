@@ -19,10 +19,11 @@ package org.apache.phoenix.log;
 
 import com.lmax.disruptor.ExceptionHandler;
 
-class QueryLoggerDefaultExceptionHandler implements ExceptionHandler<RingBufferEvent> {
+class QueryLoggerDefaultExceptionHandler implements ExceptionHandler {
+
 
     @Override
-    public void handleEventException(Throwable ex, long sequence, RingBufferEvent event) {
+    public void handleEventException(Throwable ex, long sequence, Object event) {
         final StringBuilder sb = new StringBuilder(512);
         sb.append("Query Logger error handling event seq=").append(sequence).append(", value='");
         try {

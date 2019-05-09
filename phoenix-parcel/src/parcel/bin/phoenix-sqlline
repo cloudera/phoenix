@@ -31,10 +31,10 @@
   BIN_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
   LIB_DIR=$BIN_DIR/../lib
 
-
 # Autodetect JAVA_HOME if not defined
 . $LIB_DIR/../../CDH/lib/bigtop-utils/bigtop-detect-javahome
 
-export HBASE_CONF_PATH=${HBASE_CONF_PATH:-/etc/hbase/conf}
+export HBASE_CONF_DIR=${HBASE_CONF_DIR:-/etc/hbase/conf}
 export PATH=$JAVA_HOME/jre/bin:$PATH
+
 exec $LIB_DIR/phoenix/bin/sqlline.py "$@"

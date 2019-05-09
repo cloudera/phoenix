@@ -1,26 +1,32 @@
 {
-    "phoenix-performance": {
-      "destination": "/usr/bin/phoenix-performance",
-      "source": "bin/phoenix-performance",
-      "priority": 10,
-      "isDirectory": false
-    },
-    "phoenix-psql": {
-      "destination": "/usr/bin/phoenix-psql",
-      "source": "bin/phoenix-psql",
-      "priority": 10,
-      "isDirectory": false
-    },
-    "phoenix-sqlline": {
-      "destination": "/usr/bin/phoenix-sqlline",
-      "source": "bin/phoenix-sqlline",
-      "priority": 10,
-      "isDirectory": false
-    },
-    "phoenix-queryserver": {
-      "destination": "/usr/bin/phoenix-queryserver",
-      "source": "bin/phoenix-queryserver",
-      "priority": 10,
-      "isDirectory": false
-    }
+  "phoenix-performance": {
+    "destination": "/usr/bin/phoenix-performance",
+    "source": "bin/phoenix-performance",
+    "priority": 10,
+    "isDirectory": false
+  },
+  "phoenix-psql": {
+    "destination": "/usr/bin/phoenix-psql",
+    "source": "bin/phoenix-psql",
+    "priority": 10,
+    "isDirectory": false
+  },
+  "phoenix-sqlline": {
+    "destination": "/usr/bin/phoenix-sqlline",
+    "source": "bin/phoenix-sqlline",
+    "priority": 10,
+    "isDirectory": false
+  },
+  "phoenix-sqlline-thin": {
+    "destination": "/usr/bin/phoenix-sqlline-thin",
+    "source": "bin/phoenix-sqlline-thin",
+    "priority": 10,
+    "isDirectory": false
+  },
+  "phoenix-queryserver": {
+    "destination": "/usr/bin/phoenix-queryserver",
+    "source": "bin/phoenix-queryserver",
+    "priority": 10,
+    "isDirectory": false
+  }
 }

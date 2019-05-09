@@ -37,4 +37,4 @@
 
 export HBASE_CONF_DIR=${HBASE_CONF_DIR:-/etc/hbase/conf}
 export PATH=$JAVA_HOME/jre/bin:$PATH
-exec $LIB_DIR/phoenix/bin/queryserver.py "$@"
+exec $LIB_DIR/phoenix/bin/sqlline-thin.py "$@"

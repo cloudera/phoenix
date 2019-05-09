@@ -35,5 +35,6 @@
 # Autodetect JAVA_HOME if not defined
 . $LIB_DIR/../../CDH/lib/bigtop-utils/bigtop-detect-javahome
 
+export HBASE_CONF_DIR=${HBASE_CONF_DIR:-/etc/hbase/conf}
 export PATH=$JAVA_HOME/jre/bin:$PATH
 exec $LIB_DIR/phoenix/bin/psql.py "$@"

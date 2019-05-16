@@ -62,24 +62,17 @@ cd $OUTPUT_REPO
 
 S3_ROOT=phoenix/${CDH_VERSION}
 S3_PARCELS=${S3_ROOT}/parcels
-S3_CSD=${S3_ROOT}/csd
 S3_MAVEN=${S3_ROOT}/maven-repository
 
 # populate parcels and generate manifest.json
-mkdir -p ${S3_PARCELS} ${S3_CSD} ${S3_MAVEN}
+mkdir -p ${S3_PARCELS} ${S3_MAVEN}
 cp -v /phoenix/build-parcel/PHOENIX-*.parcel ${S3_PARCELS}
 cp -v /phoenix/build-parcel/PHOENIX-*.parcel.sha1 ${S3_PARCELS}
 $VIRTUAL_DIR/bin/parcelmanifest ${S3_PARCELS}
 
 # copying maven artifacts
-#TODO: not ready yet
-#mkdir -p ${S3_MAVEN}/org/apache
-#cp -a /phoenix/phoenix-assembly/target/phoenix-assembly-${PHOENIX_VERSION}-*-repository/org/apache/phoenix ${S3_MAVEN}/org/apache
-
-# getting csd
-#TODO: not ready yet
-#CM_GBN=$(curl -s 'http://builddb.infra.cloudera.com/query?product=cm&user=jenkins&version=6.x.0&tag=official')
-#curl -s "http://cloudera-build-us-west-1.vpc.cloudera.com/s3/build/${CM_GBN}/cm6/6.x.0/generic/maven/com/cloudera/csd/PHOENIX/6.x.0/PHOENIX-6.x.0.jar" -o ${S3_CSD}/PHOENIX-${CDH_VERSION}.jar
+mkdir -p ${S3_MAVEN}/org/apache
+cp -a /maven-repo/org/apache/phoenix ${S3_MAVEN}/org/apache
 
 # create build.json
 user=jenkins
@@ -94,11 +87,8 @@ $VIRTUAL_DIR/bin/buildjson \
 	--gbn $GBN -os redhat6 -os redhat7 -os sles12 -os ubuntu1604 \
 	--build-environment $BUILD_URL ${BUILD_JSON_EXIPIRATION} \
 	--user ${user} \
-	add_parcels --product-parcels ${COMPONENT_NAME} ${S3_PARCELS}
-
-#TODO: add csd and maven to buildjson
-	#add_maven --product-base ${COMPONENT_NAME} ${S3_MAVEN}
-	# add_csd --files ${COMPONENT_NAME} ${S3_CSD}/*.jar \
+	add_parcels --product-parcels ${COMPONENT_NAME} ${S3_PARCELS} \
+	add_maven --product-base ${COMPONENT_NAME} ${S3_MAVEN}
 
 $VIRTUAL_DIR/bin/htmllisting $OUTPUT_REPO
 

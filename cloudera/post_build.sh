@@ -84,7 +84,8 @@ fi
 
 $VIRTUAL_DIR/bin/buildjson \
 	-o build.json -p ${PRODUCT_NAME} --version ${CDH_VERSION} \
-	--gbn $GBN -os redhat6 -os redhat7 -os sles12 -os ubuntu1604 \
+	--gbn $GBN -os redhat5 -os redhat6 -os redhat7 -os sles11 -os sles12 \
+	-os ubuntu1404 -os ubuntu1604 -os debian7 -os debian8 \
 	--build-environment $BUILD_URL ${BUILD_JSON_EXIPIRATION} \
 	--user ${user} \
 	add_parcels --product-parcels ${COMPONENT_NAME} ${S3_PARCELS} \

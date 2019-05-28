@@ -147,8 +147,6 @@ public class TestCoveredColumnIndexCodec {
    * @throws Exception on failure
    */
   @Test
-  //Succeeds with hbase 2.1.0, fails with 2.1.1 or 2.1.0-CDH
-  @Ignore 
   public void testGeneratedIndexUpdates() throws Exception {
     ColumnGroup group = new ColumnGroup("test-column-group");
     group.add(COLUMN_REF);

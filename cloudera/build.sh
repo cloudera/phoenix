@@ -96,7 +96,7 @@ fi
 
 big_console_header "PARENT_VERSION: ${PARENT_VERSION}"
 
-# getting project version from pom.xml (e.g. 4.14.1-cdh5.16.3-SNAPSHOT)
+# getting project version from pom.xml (e.g. 4.14.1-cdh5.16.2-SNAPSHOT)
 FULL_VERSION=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)
 
 if [ -z "$FULL_VERSION" ]; then
@@ -104,7 +104,7 @@ if [ -z "$FULL_VERSION" ]; then
 	exit 1
 fi
 
-# getting phoenix version (4.14.1-cdh5.16.3-SNAPSHOT -> 4.14.1)
+# getting phoenix version (4.14.1-cdh5.16.2-SNAPSHOT -> 4.14.1)
 PHOENIX_VERSION=$(echo $FULL_VERSION | sed -e 's/^\([^-]*\)-.*$/\1/')
 
 if [ -z "$PHOENIX_VERSION" ]; then
@@ -114,7 +114,7 @@ fi
 
 big_console_header "PHOENIX_VERSION: $PHOENIX_VERSION"
 
-# getting cdh version (4.14.1-cdh5.16.3-SNAPSHOT -> 5.16.3)
+# getting cdh version (4.14.1-cdh5.16.2-SNAPSHOT -> 5.16.2)
 CDH_VERSION=$(echo $FULL_VERSION | sed -e 's/^.*cdh\([^-]*\).*$/\1/')
 
 if [ -z "$CDH_VERSION" ]; then

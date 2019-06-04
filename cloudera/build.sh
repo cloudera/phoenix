@@ -145,16 +145,20 @@ cloudera.cdh.release=NA
 cloudera.build.time=${BUILD_TIME}
 EOT
 
+#Download mvn-gbn
+curl --silent --show-error --location https://github.infra.cloudera.com/raw/cdh/cdh/cdh${CDH_VERSION}/tools/mvn-gbn -o mvn-gbn
+chmod +x ./mvn-gbn
+
 if [ "${OFFICIAL}" == "true" ]; then
 	big_console_header "It is an official release, removing -SNAPSHOT"
-	mvn versions:set -DremoveSnapshot
+	./mvn-gbn versions:set -DremoveSnapshot
 fi
 
 # building Phoenix
 big_console_header "Building Phoenix"
 
 # phoenix-parcel module uses parcel.patch.count which we use for GBN
-mvn install -DskipTests -Dparcel.patch.count=${REVNO}
+./mvn-gbn install -DskipTests -Dparcel.patch.count=${REVNO}
 
 big_console_header "Creating distro parcels"
 

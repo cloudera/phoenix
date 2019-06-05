@@ -68,7 +68,7 @@ S3_MAVEN=${S3_ROOT}/maven-repository
 # populate parcels and generate manifest.json
 mkdir -p ${S3_PARCELS} ${S3_CSD} ${S3_MAVEN}
 cp -v /phoenix/build-parcel/PHOENIX-*.parcel ${S3_PARCELS}
-cp -v /phoenix/build-parcel/PHOENIX-*.parcel.sha1 ${S3_PARCELS}
+cp -v /phoenix/build-parcel/PHOENIX-*.parcel.sha ${S3_PARCELS}
 $VIRTUAL_DIR/bin/parcelmanifest ${S3_PARCELS}
 
 # copying maven artifacts

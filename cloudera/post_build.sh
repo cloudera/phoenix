@@ -17,9 +17,6 @@
 
 # This is the post build file. The file is dependent on cdh cauldron repo.
 
-#Do not push artifacts anywhere during parcel creation bring-up
-exit
-
 set -x
 set -e
 

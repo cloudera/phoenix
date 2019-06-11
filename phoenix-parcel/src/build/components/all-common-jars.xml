@@ -32,7 +32,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -45,7 +44,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -58,7 +56,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -71,7 +68,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -84,7 +80,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -102,7 +97,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -115,7 +109,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -128,7 +121,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -141,7 +133,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -155,7 +146,6 @@
         <exclude>*-javadoc.jar</exclude>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -168,7 +158,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -181,7 +170,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -194,7 +182,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
         <!-- this one goes in project root instead -->
         <exclude>phoenix-*-thin-client.jar</exclude>
       </excludes>
@@ -209,7 +196,6 @@
       <excludes>
         <exclude>*-minimal.jar</exclude>
         <exclude>*-sources.jar</exclude>
-        <exclude>*-tests.jar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
     </fileSet>

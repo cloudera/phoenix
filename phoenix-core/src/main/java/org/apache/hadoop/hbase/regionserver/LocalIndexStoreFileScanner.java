@@ -47,6 +47,15 @@ public class LocalIndexStoreFileScanner extends StoreFileScanner{
                         && this.reader.getSplitRow().length != this.reader.getOffset();
     }
 
+    public LocalIndexStoreFileScanner(Reader reader, HFileScanner hfs, boolean useMVCC,
+            boolean hasMVCC, long readPt, long scannerOrder) {
+        super(reader, hfs, useMVCC, hasMVCC, readPt, scannerOrder);
+        this.reader = ((IndexHalfStoreFileReader)super.getReader());
+        this.changeBottomKeys =
+                this.reader.getRegionInfo().getStartKey().length == 0
+                        && this.reader.getSplitRow().length != this.reader.getOffset();
+    }
+
     @Override
     public Cell next() throws IOException {
         Cell next = super.next();

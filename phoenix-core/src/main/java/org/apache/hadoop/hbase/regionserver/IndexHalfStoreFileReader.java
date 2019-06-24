@@ -132,11 +132,18 @@ public class IndexHalfStoreFileReader extends StoreFile.Reader {
         return top;
     }
 
+
     @Override
     public StoreFileScanner getStoreFileScanner(boolean cacheBlocks, boolean pread,
-                                                boolean isCompaction, long readPt) {
+            boolean isCompaction, long readPt) {
+        return getStoreFileScanner(cacheBlocks, pread, isCompaction, readPt, 0);
+    }
+
+    @Override
+    public StoreFileScanner getStoreFileScanner(boolean cacheBlocks, boolean pread,
+            boolean isCompaction, long readPt, long scannerOrder) {
         return new LocalIndexStoreFileScanner(this, getScanner(cacheBlocks, pread, isCompaction),
-                true, getHFileReader().hasMVCCInfo(), readPt);
+                true, getHFileReader().hasMVCCInfo(), readPt, scannerOrder);
     }
 
     @Override

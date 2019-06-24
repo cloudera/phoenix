@@ -51,7 +51,6 @@ import org.junit.experimental.categories.Category;
 
 import com.google.common.collect.Maps;
 
-@Ignore
 @Category(NeedsOwnMiniClusterTest.class)
 public class LocalIndexSplitMergeIT extends BaseTest {
 

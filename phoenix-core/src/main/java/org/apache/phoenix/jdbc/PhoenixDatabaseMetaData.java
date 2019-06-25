@@ -19,6 +19,7 @@ package org.apache.phoenix.jdbc;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
@@ -26,6 +27,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.hbase.Cell;
@@ -419,16 +421,18 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public ResultSet getCatalogs() throws SQLException {
+        List<String> parameterValues = new ArrayList<String>(4);
         StringBuilder buf = new StringBuilder("select \n" +
                 " DISTINCT " + TENANT_ID + " " + TABLE_CAT +
                 " from " + SYSTEM_CATALOG + " " + SYSTEM_CATALOG_ALIAS +
                 " where " + COLUMN_NAME + " is null" +
                 " and " + COLUMN_FAMILY + " is null" +
                 " and " + TENANT_ID + " is not null");
-        addTenantIdFilter(buf, null);
+        addTenantIdFilter(buf, null, parameterValues);
         buf.append(" order by " + TENANT_ID);
-        Statement stmt = connection.createStatement();
-        return stmt.executeQuery(buf.toString());
+        PreparedStatement stmt = connection.prepareStatement(buf.toString());
+        setParameters(stmt, parameterValues);
+        return stmt.executeQuery();
     }
 
     @Override
@@ -444,22 +448,26 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
 
     public static final String GLOBAL_TENANANTS_ONLY = "null";
 
-    private void addTenantIdFilter(StringBuilder buf, String tenantIdPattern) {
+    private void addTenantIdFilter(StringBuilder buf, String tenantIdPattern,
+            List<String> parameterValues) {
         PName tenantId = connection.getTenantId();
         if (tenantIdPattern == null) {
             if (tenantId != null) {
                 appendConjunction(buf);
                 buf.append(" (" + TENANT_ID + " IS NULL " +
-                        " OR " + TENANT_ID + " = '" + StringUtil.escapeStringConstant(tenantId.getString()) + "') ");
+                        " OR " + TENANT_ID + " = ?) ");
+                parameterValues.add(tenantId.getString());
             }
         } else if (tenantIdPattern.length() == 0) {
                 appendConjunction(buf);
                 buf.append(TENANT_ID + " IS NULL ");
         } else {
             appendConjunction(buf);
-            buf.append(" TENANT_ID LIKE '" + StringUtil.escapeStringConstant(tenantIdPattern) + "' ");
+            buf.append(" TENANT_ID LIKE ? ");
+            parameterValues.add(tenantIdPattern);
             if (tenantId != null) {
-                buf.append(" and TENANT_ID = '" + StringUtil.escapeStringConstant(tenantId.getString()) + "' ");
+                buf.append(" and TENANT_ID = ? ");
+                parameterValues.add(tenantId.getString());
             }
         }
     }
@@ -471,6 +479,7 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
     @Override
     public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern)
             throws SQLException {
+        List<String> parameterValues = new ArrayList<String>(4);
         StringBuilder buf = new StringBuilder("select \n " +
                 TENANT_ID + " " + TABLE_CAT + "," + // use this for tenant id
                 TABLE_SCHEM + "," +
@@ -503,14 +512,18 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
                 "CASE WHEN " + TENANT_POS_SHIFT + " THEN " + KEY_SEQ + "-1 ELSE " + KEY_SEQ + " END AS " + KEY_SEQ +
                 " from " + SYSTEM_CATALOG + " " + SYSTEM_CATALOG_ALIAS + "(" + TENANT_POS_SHIFT + " BOOLEAN)");
         StringBuilder where = new StringBuilder();
-        addTenantIdFilter(where, catalog);
+        addTenantIdFilter(where, catalog, parameterValues);
         if (schemaPattern != null) {
             appendConjunction(where);
-            where.append(TABLE_SCHEM + (schemaPattern.length() == 0 ? " is null" : " like '" + StringUtil.escapeStringConstant(schemaPattern) + "'" ));
+            where.append(TABLE_SCHEM + (schemaPattern.length() == 0 ? " is null" : " like ?" ));
+            if(schemaPattern.length() > 0) {
+                parameterValues.add(schemaPattern);
+            }
         }
         if (tableNamePattern != null && tableNamePattern.length() > 0) {
             appendConjunction(where);
-            where.append(TABLE_NAME + " like '" + StringUtil.escapeStringConstant(tableNamePattern) + "'" );
+            where.append(TABLE_NAME + " like ?" );
+            parameterValues.add(tableNamePattern);
         }
         // Allow a "." in columnNamePattern for column family match
         String colPattern = null;
@@ -528,11 +541,13 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
             if (cfPattern != null && cfPattern.length() > 0) { // if null or empty, will pick up all columns
                 // Will pick up only KV columns
                 appendConjunction(where);
-                where.append(COLUMN_FAMILY + " like '" + StringUtil.escapeStringConstant(cfPattern) + "'" );
+                where.append(COLUMN_FAMILY + " like ?" );
+                parameterValues.add(cfPattern);
             }
             if (colPattern != null && colPattern.length() > 0) {
                 appendConjunction(where);
-                where.append(COLUMN_NAME + " like '" + StringUtil.escapeStringConstant(colPattern) + "'" );
+                where.append(COLUMN_NAME + " like ?" );
+                parameterValues.add(colPattern);
             }
         }
         if (colPattern == null || colPattern.length() == 0) {
@@ -549,13 +564,14 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
             buf.append(" where " + where);
         }
         buf.append(" order by " + TENANT_ID + "," + TABLE_SCHEM + "," + TABLE_NAME + "," + SYSTEM_CATALOG_ALIAS + "." + ORDINAL_POSITION);
-
         Statement stmt;
         if (isTenantSpecificConnection) {
+            final PhoenixPreparedStatement phoenixPreparedStatement = new PhoenixPreparedStatement(
+                    connection, buf.toString());
             stmt = connection.createStatement(new PhoenixStatementFactory() {
                 @Override
                 public PhoenixStatement newStatement(PhoenixConnection connection) {
-                    return new PhoenixStatement(connection) {
+                    return new PhoenixPreparedStatement(phoenixPreparedStatement) {
                         @Override
                         public PhoenixResultSet newResultSet(ResultIterator iterator, RowProjector projector,
                                 StatementContext context) throws SQLException {
@@ -566,9 +582,11 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
                 }
             });
         } else {
-            stmt = connection.createStatement();
+            stmt = connection.prepareStatement(buf.toString());
         }
-        return stmt.executeQuery(buf.toString());
+        PreparedStatement preparedStatement = ((PreparedStatement)stmt);
+        setParameters(preparedStatement, parameterValues);
+        return preparedStatement.executeQuery();
     }
     
 //    private ColumnResolver getColumnResolverForCatalogTable() throws SQLException {
@@ -735,6 +753,7 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
         if (unique) { // No unique indexes
             return emptyResultSet;
         }
+        List<String> parameterValues = new ArrayList<String>(4);
         StringBuilder buf = new StringBuilder("select \n" +
                 TENANT_ID + " " + TABLE_CAT + ",\n" + // use this column for column family name
                 TABLE_SCHEM + ",\n" +
@@ -758,13 +777,18 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
                 ARRAY_SIZE +
                 "\nfrom " + SYSTEM_CATALOG +
                 "\nwhere ");
-        buf.append(TABLE_SCHEM + (schema == null || schema.length() == 0 ? " is null" : " = '" + StringUtil.escapeStringConstant(schema) + "'" ));
-        buf.append("\nand " + DATA_TABLE_NAME + " = '" + StringUtil.escapeStringConstant(table) + "'" );
+        buf.append(TABLE_SCHEM + (schema == null || schema.length() == 0 ? " is null" : " = ?" ));
+        if(schema != null && schema.length() > 0) {
+            parameterValues.add(schema);
+        }
+        buf.append("\nand " + DATA_TABLE_NAME + " = ?" );
+        parameterValues.add(table);
         buf.append("\nand " + COLUMN_NAME + " is not null" );
-        addTenantIdFilter(buf, catalog);
+        addTenantIdFilter(buf, catalog, parameterValues);
         buf.append("\norder by INDEX_NAME," + ORDINAL_POSITION);
-        Statement stmt = connection.createStatement();
-        return stmt.executeQuery(buf.toString());
+        PreparedStatement stmt = connection.prepareStatement(buf.toString());
+        setParameters(stmt, parameterValues);
+        return stmt.executeQuery();
     }
 
 
@@ -888,6 +912,7 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
         if (table == null || table.length() == 0) {
             return emptyResultSet;
         }
+        List<String> parameterValues = new ArrayList<String>(4);
         StringBuilder buf = new StringBuilder("select \n" +
                 TENANT_ID + " " + TABLE_CAT + "," + // use catalog for tenant_id
                 TABLE_SCHEM + "," +
@@ -903,13 +928,19 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
                 VIEW_CONSTANT +
                 " from " + SYSTEM_CATALOG + " " + SYSTEM_CATALOG_ALIAS +
                 " where ");
-        buf.append(TABLE_SCHEM + (schema == null || schema.length() == 0 ? " is null" : " = '" + StringUtil.escapeStringConstant(schema) + "'" ));
-        buf.append(" and " + TABLE_NAME + " = '" + StringUtil.escapeStringConstant(table) + "'" );
+        buf.append(TABLE_SCHEM + (schema == null || schema.length() == 0 ? " is null" : " = ?" ));
+        if(schema != null && schema.length() > 0) {
+            parameterValues.add(schema);
+        }
+        buf.append(" and " + TABLE_NAME + " = ?" );
+        parameterValues.add(table);
         buf.append(" and " + COLUMN_NAME + " is not null");
         buf.append(" and " + COLUMN_FAMILY + " is null");
-        addTenantIdFilter(buf, catalog);
+        addTenantIdFilter(buf, catalog, parameterValues);
         buf.append(" order by " + TENANT_ID + "," + TABLE_SCHEM + "," + TABLE_NAME + " ," + COLUMN_NAME);
-        ResultSet rs = connection.createStatement().executeQuery(buf.toString());
+        PreparedStatement preparedStatement = connection.prepareStatement(buf.toString());
+        setParameters(preparedStatement, parameterValues);
+        ResultSet rs = preparedStatement.executeQuery();
         return rs;
     }
 
@@ -962,14 +993,16 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public ResultSet getSchemas(String catalog, String schemaPattern) throws SQLException {
+        List<String> parameterValues = new ArrayList<String>(4);
         StringBuilder buf = new StringBuilder("select distinct \n" +
                 TABLE_SCHEM + "," +
                 TENANT_ID + " " + TABLE_CATALOG +
                 " from " + SYSTEM_CATALOG + " " + SYSTEM_CATALOG_ALIAS +
                 " where " + COLUMN_NAME + " is null");
-        addTenantIdFilter(buf, catalog);
+        addTenantIdFilter(buf, catalog, parameterValues);
         if (schemaPattern != null) {
-            buf.append(" and " + TABLE_SCHEM + " like '" + StringUtil.escapeStringConstant(schemaPattern) + "'");
+            buf.append(" and " + TABLE_SCHEM + " like ?");
+            parameterValues.add(schemaPattern);
         }
         if (SchemaUtil.isNamespaceMappingEnabled(null, connection.getQueryServices().getProps())) {
             buf.append(" and " + TABLE_NAME + " = '" + MetaDataClient.EMPTY_TABLE + "'");
@@ -977,8 +1010,10 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
 
         // TODO: we should union this with SYSTEM.SEQUENCE too, but we only have support for
         // UNION ALL and we really need UNION so that it dedups.
-        Statement stmt = connection.createStatement();
-        return stmt.executeQuery(buf.toString());
+
+        PreparedStatement stmt = connection.prepareStatement(buf.toString());
+        setParameters(stmt, parameterValues);
+        return stmt.executeQuery();
     }
 
     @Override
@@ -993,6 +1028,7 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public ResultSet getSuperTables(String catalog, String schemaPattern, String tableNamePattern) throws SQLException {
+        List<String> parameterValues = new ArrayList<String>(4);
         StringBuilder buf = new StringBuilder("select \n" +
                 TENANT_ID + " " + TABLE_CAT + "," + // Use tenantId for catalog
                 TABLE_SCHEM + "," +
@@ -1001,16 +1037,21 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
                 " from " + SYSTEM_CATALOG + " " + SYSTEM_CATALOG_ALIAS +
                 " where " + COLUMN_NAME + " is null" +
                 " and " + LINK_TYPE + " = " + LinkType.PHYSICAL_TABLE.getSerializedValue());
-        addTenantIdFilter(buf, catalog);
+        addTenantIdFilter(buf, catalog, parameterValues);
         if (schemaPattern != null) {
-            buf.append(" and " + TABLE_SCHEM + (schemaPattern.length() == 0 ? " is null" : " like '" + StringUtil.escapeStringConstant(schemaPattern) + "'" ));
+            buf.append(" and " + TABLE_SCHEM + (schemaPattern.length() == 0 ? " is null" : " like ?" ));
+            if(schemaPattern.length() != 0) {
+                parameterValues.add(schemaPattern);
+            }
         }
         if (tableNamePattern != null) {
-            buf.append(" and " + TABLE_NAME + " like '" + StringUtil.escapeStringConstant(tableNamePattern) + "'" );
+            buf.append(" and " + TABLE_NAME + " like ?" );
+            parameterValues.add(tableNamePattern);
         }
         buf.append(" order by " + TENANT_ID + "," + TABLE_SCHEM + "," +TABLE_NAME + "," + SUPERTABLE_NAME);
-        Statement stmt = connection.createStatement();
-        return stmt.executeQuery(buf.toString());
+        PreparedStatement stmt = connection.prepareStatement(buf.toString());
+        setParameters(stmt, parameterValues);
+        return stmt.executeQuery();
     }
 
     @Override
@@ -1083,6 +1124,7 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
         boolean isSequence = false;
         boolean hasTableTypes = types != null && types.length > 0;
         StringBuilder typeClauseBuf = new StringBuilder();
+        List<String> parameterValues = new ArrayList<String>(4);
         if (hasTableTypes) {
             List<String> tableTypes = Lists.newArrayList(types);
             isSequence = tableTypes.remove(SEQUENCE_TABLE_TYPE);
@@ -1135,7 +1177,7 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
                     " where " + COLUMN_NAME + " is null" +
                     " and " + COLUMN_FAMILY + " is null" +
                     " and " + TABLE_NAME + " != '" + MetaDataClient.EMPTY_TABLE + "'");
-            addTenantIdFilter(buf, catalog);
+            addTenantIdFilter(buf, catalog, parameterValues);
             if (schemaPattern != null) {
                 buf.append(" and " + TABLE_SCHEM + (schemaPattern.length() == 0 ? " is null" : " like '" + StringUtil.escapeStringConstant(schemaPattern) + "'" ));
             }
@@ -1175,7 +1217,7 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
             buf.append(
                     " from " + SYSTEM_SEQUENCE + "\n");
             StringBuilder whereClause = new StringBuilder();
-            addTenantIdFilter(whereClause, catalog);
+            addTenantIdFilter(whereClause, catalog, parameterValues);
             if (schemaPattern != null) {
                 appendConjunction(whereClause);
                 whereClause.append(SEQUENCE_SCHEMA + (schemaPattern.length() == 0 ? " is null" : " like '" + StringUtil.escapeStringConstant(schemaPattern) + "'\n" ));
@@ -1190,8 +1232,9 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
             }
         }
         buf.append(" order by 4, 1, 2, 3\n");
-        Statement stmt = connection.createStatement();
-        return stmt.executeQuery(buf.toString());
+        PreparedStatement stmt = connection.prepareStatement(buf.toString());
+        setParameters(stmt, parameterValues);
+        return stmt.executeQuery();
     }
 
     @Override
@@ -1709,5 +1752,13 @@ public class PhoenixDatabaseMetaData implements DatabaseMetaData {
     @Override
     public boolean generatedKeyAlwaysReturned() throws SQLException {
         return false;
+    }
+
+
+    private void setParameters(PreparedStatement stmt, List<String> parameterValues)
+            throws SQLException {
+        for(int i = 0; i < parameterValues.size(); i++) {
+            stmt.setString(i+1, parameterValues.get(i));
+        }
     }
 }

@@ -24,6 +24,7 @@ import org.apache.phoenix.jdbc.PhoenixDatabaseMetaData;
 import org.apache.phoenix.query.QueryConstants;
 import org.apache.phoenix.schema.TableNotFoundException;
 import org.apache.phoenix.util.SchemaUtil;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -133,6 +134,8 @@ public class ChangePermissionsIT extends BasePermissionsIT {
      * Test to verify READ permissions on table, indexes and views
      * Tests automatic grant revoke of permissions per user on a table
      */
+    //FIXME CDH-80958 Disable for cdh6.2.0 To be re-enabled for later versions 
+    @Ignore 
     @Test
     public void testReadPermsOnTableIndexAndView() throws Exception {
 

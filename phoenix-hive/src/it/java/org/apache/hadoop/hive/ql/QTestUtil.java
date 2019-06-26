@@ -18,7 +18,7 @@
 
 package org.apache.hadoop.hive.ql;
 
-import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_DATABASE_NAME;
+import static org.apache.hadoop.hive.metastore.MetaStoreUtils.DEFAULT_DATABASE_NAME;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -91,9 +91,6 @@ import org.apache.hadoop.hive.common.io.SortPrintStream;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.llap.io.api.LlapProxy;
-import org.apache.hadoop.hive.metastore.Warehouse;
-import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.ql.cache.results.QueryResultsCache;
 import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.exec.Task;
 import org.apache.hadoop.hive.ql.exec.Utilities;
@@ -103,7 +100,6 @@ import org.apache.hadoop.hive.ql.exec.tez.TezSessionState;
 import org.apache.hadoop.hive.ql.lockmgr.zookeeper.CuratorFrameworkSingleton;
 import org.apache.hadoop.hive.ql.lockmgr.zookeeper.ZooKeeperHiveLockManager;
 import org.apache.hadoop.hive.ql.metadata.Hive;
-import org.apache.hadoop.hive.ql.metadata.HiveMaterializedViewsRegistry;
 import org.apache.hadoop.hive.ql.metadata.InvalidTableException;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
@@ -528,7 +524,7 @@ public class QTestUtil {
     // HIVE-14443 move this fall-back logic to CliConfigs
     if (confDir != null && !confDir.isEmpty()) {
       HiveConf.setHiveSiteLocation(new URL("file://"+ new File(confDir).toURI().getPath() + "/hive-site.xml"));
-      MetastoreConf.setHiveSiteLocation(HiveConf.getHiveSiteLocation());
+      HiveConf.setHivemetastoreSiteUrl(HiveConf.getMetastoreSiteLocation());
       System.out.println("Setting hive-site: "+HiveConf.getHiveSiteLocation());
     }
 
@@ -626,8 +622,7 @@ public class QTestUtil {
         if (EnumSet.of(MiniClusterType.llap_local, MiniClusterType.tez_local).contains(clusterType)) {
           mr = shims.getLocalMiniTezCluster(conf, clusterType == MiniClusterType.llap_local);
         } else {
-          mr = shims.getMiniTezCluster(conf, numTrackers, uriString,
-              EnumSet.of(MiniClusterType.llap, MiniClusterType.llap_local).contains(clusterType));
+          mr = shims.getMiniTezCluster(conf, numTrackers, uriString);
         }
       } else if (clusterType == MiniClusterType.miniSparkOnYarn) {
         mr = shims.getMiniSparkCluster(conf, 2, uriString, 1);
@@ -643,7 +638,7 @@ public class QTestUtil {
     }
 
     if (clusterType.getCoreClusterType() == CoreClusterType.TEZ) {
-      SessionState.get().getTezSession().destroy();
+      SessionState.get().getTezSession().close(false);
     }
     
     setup.tearDown();
@@ -887,10 +882,6 @@ public class QTestUtil {
           LOG.warn("Trying to drop table " + e.getTableName() + ". But it does not exist.");
           continue;
         }
-        // only remove MVs first
-        if (!tblObj.isMaterializedView()) {
-          continue;
-        }
         db.dropTable(dbName, tblName, true, true, fsType == FsType.encrypted_hdfs);
       }
     }
@@ -906,10 +897,6 @@ public class QTestUtil {
             tblObj = db.getTable(tblName);
           } catch (InvalidTableException e) {
             LOG.warn("Trying to drop table " + e.getTableName() + ". But it does not exist.");
-            continue;
-          }
-          // only remove MVs first
-          if (!tblObj.isMaterializedView()) {
             continue;
           }
           db.dropTable(dbName, tblName, true, true, fsType == FsType.encrypted_hdfs);
@@ -952,9 +939,6 @@ public class QTestUtil {
     if (System.getenv(QTEST_LEAVE_FILES) != null) {
       return;
     }
-
-    // Remove any cached results from the previous test.
-    QueryResultsCache.cleanupInstance();
 
     // allocate and initialize a new conf since a test can
     // modify conf by using 'set' commands
@@ -1089,9 +1073,6 @@ public class QTestUtil {
     if (mr != null) {
       createRemoteDirs();
     }
-
-    // Create views registry
-    HiveMaterializedViewsRegistry.get().init();
 
     testWarehouse = conf.getVar(HiveConf.ConfVars.METASTOREWAREHOUSE);
     String execEngine = conf.get("hive.execution.engine");
@@ -1256,7 +1237,16 @@ public class QTestUtil {
   }
 
   public int execute(String tname) {
-    return drv.run(qMap.get(tname)).getResponseCode();
+    int maxRetries = 10;
+    while(maxRetries>0) {
+      try {
+        return drv.run(qMap.get(tname)).getResponseCode();
+      } catch (CommandNeedRetryException e) {
+        maxRetries--;
+        LOG.warn("Caught CommandNeedRetryException, retrying", e);
+      }
+    }
+    return -1;
   }
 
   public int executeClient(String tname1, String tname2) {
@@ -1430,7 +1420,7 @@ public class QTestUtil {
       .run("FROM dest4_sequencefile INSERT OVERWRITE TABLE dest4 SELECT dest4_sequencefile.*");
 
     // Drop dest4_sequencefile
-    db.dropTable(Warehouse.DEFAULT_DATABASE_NAME, "dest4_sequencefile",
+    db.dropTable(DEFAULT_DATABASE_NAME, "dest4_sequencefile",
         true, true);
   }
 

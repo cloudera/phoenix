@@ -315,7 +315,10 @@ public class HivePhoenixStoreIT  extends BaseHivePhoenixStoreIT {
     public void testTimestampPredicate() throws Exception {
         String testName = "testTimeStampPredicate";
         hbaseTestUtil.getTestFileSystem().createNewFile(new Path(hiveLogDir, testName + ".out"));
-        createFile("10\t2013-01-02 01:01:01.123\n", new Path(hiveOutputDir, testName + ".out").toString());
+        //This test used to expect the timestamp to get truncated to miliseconds, 
+        //but both phoenix, and hive define timestamp as having nansoecond resolution, so it
+        //looks like this was a workaround for and old bug
+        createFile("10\t2013-01-02 01:01:01.123456\n", new Path(hiveOutputDir, testName + ".out").toString());
         createFile(StringUtil.EMPTY_STRING, new Path(hiveLogDir, testName + ".out").toString());
 
         StringBuilder sb = new StringBuilder();

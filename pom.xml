@@ -102,36 +102,35 @@
 
     <!-- Hadoop Versions -->
     <hbase.version>${cdh.hbase.version}</hbase.version>
-<!--     <hbase.version>2.1.1</hbase.version> -->
     <hadoop.version>${cdh.hadoop.version}</hadoop.version>
 	
     <!-- Dependency versions -->
-    <commons-cli.version>1.4</commons-cli.version>
+    <commons-cli.version>${cdh.commons-cli.version}</commons-cli.version>
     <hive.version>${cdh.hive.version}</hive.version>
-    <pig.version>0.13.0</pig.version>
-    <jackson.version>1.9.2</jackson.version>
-    <antlr.version>3.5.2</antlr.version>
-    <log4j.version>1.2.17</log4j.version>
+    <pig.version>${cdh.pig.version}</pig.version>
+    <jackson.version>${cdh.jackson.version}</jackson.version>
+    <antlr.version>${cdh.antlr.version}</antlr.version>
+    <log4j.version>${cdh.log4j.version}</log4j.version>
     <disruptor.version>3.3.6</disruptor.version>
     <slf4j.version>${cdh.slf4j.version}</slf4j.version>
-    <protobuf-java.version>2.5.0</protobuf-java.version>
-    <commons-io.version>2.1</commons-io.version>
-    <commons-lang.version>2.5</commons-lang.version>
-    <commons-logging.version>1.2</commons-logging.version>
+    <protobuf-java.version>${cdh.protobuf.version}</protobuf-java.version>
+    <commons-io.version>${cdh.commons-io.version}</commons-io.version>
+    <commons-lang.version>${cdh.commons-lang.version}</commons-lang.version>
+    <commons-logging.version>${cdh.commons-logging.version}</commons-logging.version>
     <commons-csv.version>1.0</commons-csv.version>
     <sqlline.version>1.2.0</sqlline.version>
     <guava.version>13.0.1</guava.version>
-    <flume.version>1.4.0</flume.version>
-    <kafka.version>0.9.0.0</kafka.version>
+    <flume.version>${cdh.flume-ng.version}</flume.version>
+    <kafka.version>${cdh.kafka.version}</kafka.version>
     <findbugs-annotations.version>1.3.9-1</findbugs-annotations.version>
     <jcip-annotations.version>1.0-1</jcip-annotations.version>
-    <jline.version>2.11</jline.version>
+    <jline.version>${cdh.jline.version}</jline.version>
     <snappy.version>0.3</snappy.version>
-    <commons-codec.version>1.10</commons-codec.version>
+    <commons-codec.version>${cdh.commons-codec.version}</commons-codec.version>
     <htrace.version>3.1.0-incubating</htrace.version>
-    <collections.version>3.2.2</collections.version>
+    <collections.version>${cdh.commons-collections.version}</collections.version>
     <!-- Do not change jodatime.version until HBASE-15199 is fixed -->
-    <jodatime.version>1.6</jodatime.version>
+    <jodatime.version>${cdh.joda-time.version}</jodatime.version>
     <joni.version>2.1.2</joni.version>
     <avatica.version>1.11.0</avatica.version>
     <jetty.version>${cdh.jetty9.version}</jetty.version>

@@ -204,4 +204,15 @@ else:
     cmd = java_cmd % {'java': java, 'root_logger': 'INFO,console', 'log_dir': '.', 'log_file': 'psql.log'}
     # Because shell=True is not set, we don't have to alter the environment
     child = subprocess.Popen(cmd.split())
+
+    # notify the child when we're killed
+    def handler(signum, frame):
+        if child:
+            print "%s terminating Query Server" % datetime.datetime.now()
+            child.send_signal(signum)
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, handler)
+    signal.signal(signal.SIGINT, handler)
+
     sys.exit(child.wait())

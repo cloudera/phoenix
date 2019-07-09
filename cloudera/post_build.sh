@@ -69,6 +69,7 @@ S3_MAVEN=${S3_ROOT}/maven-repository
 mkdir -p ${S3_PARCELS} ${S3_CSD} ${S3_MAVEN}
 cp -v /phoenix/build-parcel/PHOENIX-*.parcel ${S3_PARCELS}
 cp -v /phoenix/build-parcel/PHOENIX-*.parcel.sha ${S3_PARCELS}
+cp -v /phoenix/build-parcel/csd/${CSD_NAME}.jar ${S3_CSD}
 $VIRTUAL_DIR/bin/parcelmanifest ${S3_PARCELS}
 
 # copying maven artifacts
@@ -89,11 +90,11 @@ $VIRTUAL_DIR/bin/buildjson \
 	--gbn $GBN -os redhat6 -os redhat7 -os sles12 -os ubuntu1604 \
 	--build-environment $BUILD_URL ${BUILD_JSON_EXIPIRATION} \
 	--user ${user} \
-	add_parcels --product-parcels ${COMPONENT_NAME} ${S3_PARCELS}
+	add_parcels --product-parcels ${COMPONENT_NAME} ${S3_PARCELS} \
+	add_csd --files ${COMPONENT_NAME} ${S3_CSD}/${CSD_NAME}.jar
 
-#TODO: add csd and maven to buildjson
+#TODO: add maven to buildjson
 	#add_maven --product-base ${COMPONENT_NAME} ${S3_MAVEN}
-	# add_csd --files ${COMPONENT_NAME} ${S3_CSD}/*.jar \
 
 $VIRTUAL_DIR/bin/htmllisting $OUTPUT_REPO
 

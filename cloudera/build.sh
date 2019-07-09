@@ -191,6 +191,14 @@ done
 	done
 )
 
+# build CSD
+big_console_header "Building CSD"
+mkdir ${OUTPUT_DIR}/csd
+CSD_NAME=$(basename `ls -d cloudera/csd/*`)
+pushd cloudera/csd/${CSD_NAME}
+jar -cvf ${OUTPUT_DIR}/csd/${CSD_NAME}.jar *
+popd
+
 # Get the S3 credentials. Needed for pushing final artifacts to the cloud.
 ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa_systest s3@cloudcat-s3.infra.cloudera.com build  > ~/.s3-auth-file
 
@@ -211,6 +219,7 @@ docker run \
 	-e GBN="${GBN}" \
 	-e PHOENIX_VERSION="${PHOENIX_VERSION}" \
 	-e CDH_VERSION="${CDH_VERSION}" \
+	-e CSD_NAME="${CSD_NAME}" \
 	-e OFFICIAL="${OFFICIAL}" \
 	-e RELEASE_CANDIDATE="${RELEASE_CANDIDATE}" \
 	-e BUILD_URL=${BUILD_URL} \

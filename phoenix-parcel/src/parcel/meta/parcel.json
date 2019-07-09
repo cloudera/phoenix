@@ -27,8 +27,16 @@
     },
     "depends": "${parcel.depends}",
     "provides": [
+        "hbase-plugin",
         "phoenix"
     ],
     "setActiveSymlink": true,
-    "users": {}
+    "users": {
+        "phoenix" : {
+            "home" : "/var/lib/phoenix",
+            "shell" : "/sbin/nologin",
+            "extra_groups" : [],
+            "longname" : "Phoenix"
+        }
+    }
 }

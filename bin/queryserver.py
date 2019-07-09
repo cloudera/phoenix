@@ -201,7 +201,7 @@ elif command == 'stop':
 
 else:
     # run in the foreground using defaults from log4j.properties
-    cmd = java_cmd % {'java': java, 'root_logger': 'INFO,console', 'log_dir': '.', 'log_file': 'psql.log'}
+    cmd = java_cmd % {'java': java, 'root_logger': 'INFO,DRFA,console', 'log_dir': log_dir, 'log_file': phoenix_log_file}
     # Because shell=True is not set, we don't have to alter the environment
     child = subprocess.Popen(cmd.split())
 

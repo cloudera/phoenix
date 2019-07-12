@@ -73,9 +73,8 @@ cp -v /phoenix/build-parcel/csd/${CSD_NAME}.jar ${S3_CSD}
 $VIRTUAL_DIR/bin/parcelmanifest ${S3_PARCELS}
 
 # copying maven artifacts
-#TODO: not ready yet
-#mkdir -p ${S3_MAVEN}/org/apache
-#cp -a /phoenix/phoenix-assembly/target/phoenix-assembly-${PHOENIX_VERSION}-*-repository/org/apache/phoenix ${S3_MAVEN}/org/apache
+mkdir -p ${S3_MAVEN}/org/apache
+cp -a /maven-repo/org/apache/phoenix ${S3_MAVEN}/org/apache
 
 # create build.json
 user=jenkins
@@ -91,10 +90,8 @@ $VIRTUAL_DIR/bin/buildjson \
 	--build-environment $BUILD_URL ${BUILD_JSON_EXIPIRATION} \
 	--user ${user} \
 	add_parcels --product-parcels ${COMPONENT_NAME} ${S3_PARCELS} \
-	add_csd --files ${COMPONENT_NAME} ${S3_CSD}/${CSD_NAME}.jar
-
-#TODO: add maven to buildjson
-	#add_maven --product-base ${COMPONENT_NAME} ${S3_MAVEN}
+	add_csd --files ${COMPONENT_NAME} ${S3_CSD}/${CSD_NAME}.jar \
+	add_maven --product-base ${COMPONENT_NAME} ${S3_MAVEN}
 
 $VIRTUAL_DIR/bin/htmllisting $OUTPUT_REPO
 

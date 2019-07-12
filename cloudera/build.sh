@@ -78,6 +78,7 @@ export REVNO=${GBN:-0}
 export OFFICIAL=${OFFICIAL:false}
 export BUILD_TIME=$BUILD_TIME
 export GIT_HASH=$GIT_HASH
+export MVN_REPO=${WORKSPACE}/maven-repo-${REVNO}
 
 # getting cdh version from pom.xml
 # N.B. this works because we're relying on a released version of CDH
@@ -158,7 +159,8 @@ fi
 big_console_header "Building Phoenix"
 
 # phoenix-parcel module uses parcel.patch.count which we use for GBN
-./mvn-gbn install -DskipTests -Dparcel.patch.count=${REVNO}
+./mvn-gbn install -DskipTests -Dparcel.patch.count=${REVNO} -Dmaven.repo.local=${MVN_REPO} \
+	-DcreateChecksum=true
 
 big_console_header "Creating distro parcels"
 
@@ -216,6 +218,7 @@ fi
 docker run \
 	-v ${WORKSPACE}/phoenix:/phoenix \
 	-v ${WORKSPACE}/cdh:/cdh \
+	-v ${MVN_REPO}:/maven-repo \
 	-e GBN="${GBN}" \
 	-e PHOENIX_VERSION="${PHOENIX_VERSION}" \
 	-e CDH_VERSION="${CDH_VERSION}" \

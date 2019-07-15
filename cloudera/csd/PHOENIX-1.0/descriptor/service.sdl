@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 {
-  "name" : "PHOENIX5",
+  "name" : "PHOENIX",
   "label" : "Phoenix",
   "description" : "Apache Phoenix is an open source, massively parallel, relational database engine supporting OLTP for Hadoop using Apache HBase as its backing store.",
   "version" : "1.0",
@@ -27,6 +27,7 @@
   "runAs" : {
     "user" : "phoenix",
     "group" : "phoenix",
+    "principal" : "phoenix"
   },
   "parcel" : {
     "repoUrl" : "https://archive.cloudera.com/phoenix/6.2.0/parcels/",
@@ -45,7 +46,7 @@
   ],
   "roles" : [
     {
-      "name" : "QUERYSERVER",
+      "name" : "PHOENIX_QUERY_SERVER",
       "label" : "Query Server",
       "pluralLabel" : "Query Servers",
       "startRunner" : {
@@ -56,6 +57,38 @@
           "PHOENIX_QUERYSERVER_LOG_DIR" : "${log_dir}"
         }
       },
+      "kerberosPrincipals" : [
+        {
+          "name" : "phoenix_principal",
+          "primary" : "${principal}",
+          "instance" : "${host}"
+        },
+        {
+          "name" : "spnego_principal",
+          "primary" : "HTTP",
+          "instance" : "${host}"
+        }
+      ],
+      "configWriter" : {
+        "generators": [
+          {
+            "filename" : "phoenix-site.xml",
+            "configFormat" : "hadoop_xml",
+            "kerberosPrincipals": [
+              {
+                "principalName": "phoenix_principal",
+                "propertyName": "phoenix.queryserver.kerberos.principal",
+                "instanceWildcard": "_HOST"
+              },
+              {
+                "principalName": "spnego_principal",
+                "propertyName": "phoenix.queryserver.http.kerberos.principal",
+                "instanceWildcard": "_HOST"
+              }
+            ]
+          }
+        ]
+      },
       "logging" : {
         "dir" : "/var/log/phoenix",
         "filename" : "phoenix-${user}-queryserver.log",
@@ -63,7 +96,7 @@
         "modifiable" : true
       },
       "topology" : {
-        "minInstances" : 0
+        "minInstances" : 1
       }
     }
   ]

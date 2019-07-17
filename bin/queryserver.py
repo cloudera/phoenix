@@ -123,7 +123,7 @@ java_cmd = '%(java)s -cp ' + hbase_config_path + os.pathsep + hadoop_config_path
     phoenix_utils.phoenix_client_jar + os.pathsep + phoenix_utils.phoenix_queryserver_jar + \
     os.pathsep + hadoop_classpath + \
     " -Dproc_phoenixserver" + \
-    " -Dlog4j.configuration=file:" + os.path.join(phoenix_utils.current_dir, "log4j.properties") + \
+    " -Dlog4j.configuration=file:" + os.path.join(hbase_config_path, "..", "log4j.properties") + \
     " -Dpsql.root.logger=%(root_logger)s" + \
     " -Dpsql.log.dir=%(log_dir)s" + \
     " -Dpsql.log.file=%(log_file)s" + \

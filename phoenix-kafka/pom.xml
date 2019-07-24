@@ -212,10 +212,6 @@
 					<groupId>xom</groupId>
 					<artifactId>xom</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.glassfish.web</groupId>
-					<artifactId>javax.servlet.jsp</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>

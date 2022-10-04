@@ -101,7 +101,7 @@
     <log4j.version>1.2.17</log4j.version>
     <disruptor.version>3.3.0</disruptor.version>
     <slf4j.version>${cdh.slf4j.version}</slf4j.version>
-    <protobuf-java.version>2.5.0</protobuf-java.version>
+    <protobuf-java.version>3.16.3</protobuf-java.version>
     <commons-logging.version>1.2</commons-logging.version>
     <commons-csv.version>1.0</commons-csv.version>
     <sqlline.version>1.2.0</sqlline.version>
